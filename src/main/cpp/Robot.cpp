@@ -31,8 +31,10 @@ Joystick *stickMain = new Joystick(0);
 Joystick *stickRot = new Joystick(1);
 Joystick *stickXbox = new Joystick(2);
 
+PWM *gyroRate = new PWM(0);
+PWM *gyroTemp = new PWM(1);
 
-ADXRS450_Gyro *gyro = new ADXRS450_Gyro();
+// ADXRS450_Gyro *gyro = new ADXRS450_Gyro(SPI::Port::kOnboardCS0);
 
 float gyroAngle;
 
@@ -56,9 +58,9 @@ void Robot::RobotInit() {
  m_colorMatcher.AddColorMatch(kRedTarget);
  m_colorMatcher.AddColorMatch(kYellowTarget);
 
- gyro->Reset();
+//  gyro->Reset();
 
- gyro->Calibrate();
+//  gyro->Calibrate();
 }
 
 /**
@@ -89,7 +91,7 @@ void Robot::RobotPeriodic() {
     colorString = "Unknown";
   }
 
-  gyroAngle= gyro->GetAngle();
+  // gyroAngle= gyro->GetAngle();
   printf("Angle: %f", gyroAngle);
 
 
