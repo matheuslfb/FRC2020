@@ -13,7 +13,7 @@
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/Joystick.h>
 #include <ctre/Phoenix.h>
-
+#include "frc/WPILib.h"
 #include <frc/util/Color.h>
 
 #include <rev/ColorMatch.h>
@@ -29,7 +29,12 @@ WPI_TalonSRX *FR = new WPI_TalonSRX(2);
 
 Joystick *stickMain = new Joystick(0);
 Joystick *stickRot = new Joystick(1);
-Joystick *stickXbob = new Joystick(2);
+Joystick *stickXbox = new Joystick(2);
+
+
+ADXRS450_Gyro *gyro = new ADXRS450_Gyro();
+
+float gyroAngle;
 
 DifferentialDrive *driveTrain = new DifferentialDrive(*FL, *RL);
 
@@ -50,6 +55,10 @@ void Robot::RobotInit() {
  m_colorMatcher.AddColorMatch(kGreeTarget);
  m_colorMatcher.AddColorMatch(kRedTarget);
  m_colorMatcher.AddColorMatch(kYellowTarget);
+
+ gyro->Reset();
+
+ gyro->Calibrate();
 }
 
 /**
@@ -79,6 +88,9 @@ void Robot::RobotPeriodic() {
   } else {
     colorString = "Unknown";
   }
+
+  gyroAngle= gyro->GetAngle();
+  printf("Angle: %f", gyroAngle);
 
 
   // Open smart dashboard or shuffleboard to see the color detected by the sensor
