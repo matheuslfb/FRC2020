@@ -22,10 +22,33 @@
 using namespace frc;
 using namespace rev;
 
+//XboxDPAD
+const int D_UP = 0;
+const int D_UP_RIGHT = 45;
+const int D_RIGHT = 90;
+const int D_DOWN_RIGHT = 135;
+const int D_DOWN = 180;
+const int D_DOWN_LEFT = 225;
+const int D_LEFT = 270;
+const int D_UP_LEFT = 315;
+
+bool xboxA, xboxB, xboxX, xboxY, xboxLB, xboxRB, xboxBack, xboxStart, xboxLS, xboxRS;
+
+bool shooterRunning = false, grabbingCube, isPressedX = false, isPressedY = false, shooterMax = false;
+
+double leftSpeed, rightSpeed, shooterPower = 0;
+int grabberCount;
+
 WPI_TalonSRX *FL = new WPI_TalonSRX{3};
 WPI_TalonSRX *RL = new WPI_TalonSRX(4);
 WPI_TalonSRX *RR = new WPI_TalonSRX{1};
 WPI_TalonSRX *FR = new WPI_TalonSRX(2);
+
+WPI_TalonSRX *grabber = new WPI_TalonSRX(23);
+
+//shooter
+WPI_TalonSRX *shooterA = new WPI_TalonSRX(21);
+WPI_TalonSRX *shooterB = new WPI_TalonSRX(22);
 
 Joystick *stickMain = new Joystick(0);
 Joystick *stickRot = new Joystick(1);
@@ -50,17 +73,17 @@ static constexpr Color kGreeTarget = Color(0.197, 0.561, 0.240);
 static constexpr Color kRedTarget = Color(0.561, 0.232, 0.114);
 static constexpr Color kYellowTarget = Color(0.361, 0.524, 0.113);
 
-float driveFoward, driveRot;
+float driveForward, driveRot;
+
+
 
 void Robot::RobotInit() {
- m_colorMatcher.AddColorMatch(kBlueTarget);
- m_colorMatcher.AddColorMatch(kGreeTarget);
- m_colorMatcher.AddColorMatch(kRedTarget);
- m_colorMatcher.AddColorMatch(kYellowTarget);
+  RR->Follow(*FR);
+  RL->Follow(*FL);
 
-//  gyro->Reset();
+  shooterB->Follow(*shooterA);
 
-//  gyro->Calibrate();
+  driveTrain->SetExpiration(1000);
 }
 
 /**
@@ -129,10 +152,43 @@ void Robot::AutonomousPeriodic() {}
 void Robot::TeleopInit() {}
 
 void Robot::TeleopPeriodic() {
-  driveFoward = stickMain->GetY();
+
+  xboxA = stickXbox->GetRawButton(1);
+  xboxB = stickXbox->GetRawButton(2);
+  xboxX = stickXbox->GetRawButton(3);
+  xboxY = stickXbox->GetRawButton(4);
+  xboxLB = stickXbox->GetRawButton(5);
+  xboxRB = stickXbox->GetRawButton(6);
+  xboxBack = stickXbox->GetRawButton(7);
+  xboxStart = stickXbox->GetRawButton(8);
+  xboxLS = stickXbox->GetRawButton(9);
+  xboxRS = stickXbox->GetRawButton(10);
+
+   //------------GRABBER-------------------
+    if (xboxA && !xboxB)
+    {
+      grabber->Set(0.5);
+    }
+
+    else if (xboxB && !xboxA)
+    {
+      grabber->Set(-0.5);
+
+      // grabber->Set(-1.0);
+    }
+
+    else if (!grabbingCube)
+    {
+      grabber->Set(0.0);
+
+      // grabber->Set(0.0);
+    }
+
+    //------------- DRIVING -----------------
+  driveForward = stickMain->GetY();
   driveRot = stickRot->GetX();
 
-  driveTrain->ArcadeDrive(driveFoward, driveRot, true);
+  driveTrain->ArcadeDrive(driveForward, 0.7 * driveRot, true);
   Wait(0.01);
 }
 
